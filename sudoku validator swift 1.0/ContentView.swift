@@ -78,7 +78,7 @@ class GridProcessor{
             }
         }
 
-        dispatchGroup.notify(queue: .main) {
+        dispatchGroup.notify(queue: .main){
             let finalGrid = self.merge(grids: recognizedGrids)
             completion(finalGrid)
         }
@@ -104,7 +104,7 @@ class GridProcessor{
 
             if let croppedCGImage = cgImage.cropping(to: cropRect){
                 let croppedImage = UIImage(cgImage: croppedCGImage, scale: image.scale, orientation: image.imageOrientation)
-                DispatchQueue.main.async { completion(croppedImage) }
+                DispatchQueue.main.async{ completion(croppedImage) }
             }
             else{
                 DispatchQueue.main.async{ completion(image) } // Fallback
@@ -151,15 +151,15 @@ class GridProcessor{
     }
 
     // A more advanced filter to enhance local contrast and sharpen the image
-    private func enhanceWithAdvancedContrast(image: UIImage) -> CGImage? {
-        guard let ciImage = CIImage(image: image) else { return nil }
+    private func enhanceWithAdvancedContrast(image: UIImage) -> CGImage?{
+        guard let ciImage = CIImage(image: image) else{ return nil }
         let context = CIContext(options: nil)
 
         // 1. Convert to grayscale
         let grayscaleFilter = CIFilter.photoEffectMono()
         grayscaleFilter.inputImage = ciImage
         
-        guard let grayscaleOutput = grayscaleFilter.outputImage else { return nil }
+        guard let grayscaleOutput = grayscaleFilter.outputImage else{ return nil }
 
         // 2. Sharpen the image
         let sharpenFilter = CIFilter.unsharpMask()
@@ -167,7 +167,7 @@ class GridProcessor{
         sharpenFilter.radius = 2.5
         sharpenFilter.intensity = 0.7
         
-        guard let sharpenedOutput = sharpenFilter.outputImage else { return nil }
+        guard let sharpenedOutput = sharpenFilter.outputImage else{ return nil }
 
         // 3. Enhance local contrast
         let toneCurveFilter = CIFilter.toneCurve()
@@ -180,7 +180,7 @@ class GridProcessor{
         toneCurveFilter.point4 = CGPoint(x: 1.0, y: 1.0)
 
         if let outputImage = toneCurveFilter.outputImage,
-           let cgImage = context.createCGImage(outputImage, from: outputImage.extent) {
+           let cgImage = context.createCGImage(outputImage, from: outputImage.extent){
             return cgImage
         }
         return nil
@@ -216,7 +216,7 @@ class GridProcessor{
     
     // Filters for a high-contrast "noir" effect which is good for text
     private func enhanceWithNoir(image: UIImage) -> CGImage?{
-        guard let ciImage = CIImage(image: image) else { return nil }
+        guard let ciImage = CIImage(image: image) else{ return nil }
         let context = CIContext(options: nil)
         let filter = CIFilter.photoEffectNoir()
         filter.inputImage = ciImage
