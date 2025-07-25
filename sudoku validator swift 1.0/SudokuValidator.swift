@@ -1,84 +1,88 @@
 import Foundation
 
+// Defines an enum for more descriptive validation results
+enum SudokuValidationResult{
+    case validAndComplete
+    case validAndIncomplete
+    case invalid
+}
+
 struct SudokuValidator{
-    
-    // Checks the entire board
-    // Calls three helper functions to check rows, columns, and the 3 x 3 squares
-    func isValid(board: [[Int]]) -> Bool{
-        return areRowsValid(board: board) &&
-               areColumnsValid(board: board) &&
-               areSquaresValid(board: board)
+    // Checks for duplicates
+    func validate(board: [[Int]]) -> SudokuValidationResult{
+        let hasNoDuplicates = areRowsValid(board: board) && areColumnsValid(board: board) && areSquaresValid(board: board)
+        
+        if !hasNoDuplicates{
+            return .invalid
+        }
+        
+        // Checks if there are any empty cells
+        let isBoardComplete = !board.flatMap { $0 }.contains(0)
+        
+        if isBoardComplete{
+            return .validAndComplete
+        }
+        else{
+            return .validAndIncomplete
+        }
     }
     
-    // Checks if all rows are valid
+    // Checks if all the rows are valid
     private func areRowsValid(board: [[Int]]) -> Bool{
         for row in board{
-            // If an invalid row is found
             if !isSetValid(row){
-                return false
+                return false;
             }
         }
-        // All rows are valid
-        return true
+        return true;
     }
     
-    // Checks if all columns are valid
+    // Checks if all the columns are valid
     private func areColumnsValid(board: [[Int]]) -> Bool{
-        // Transposse the board to treat columns as rows for easy checking
         for colIndex in 0..<9{
             var column: [Int] = []
             for rowIndex in 0..<9{
                 column.append(board[rowIndex][colIndex])
             }
-            // If an invalid column is found
             if !isSetValid(column){
                 return false
             }
         }
-        // All columns are valid
-        return true
+        return true;
     }
     
     // Checks if all 3 x 3 squares are valid
     private func areSquaresValid(board: [[Int]]) -> Bool{
-        // Iterates through the starting point of each of the 9 squares
-        for rowOffset in stride(from: 0, to: 9, by: 3){ // 0, 3, 6
-            for colOffset in stride(from: 0, to: 9, by: 3){ // 0, 3, 6
-                
+        for rowOffset in stride(from: 0, to: 9, by: 3){
+            for colOffset in stride(from: 0, to: 9, by: 3){
                 var square: [Int] = []
                 for rowIndex in 0..<3{
                     for colIndex in 0..<3{
                         square.append(board[rowOffset + rowIndex][colOffset + colIndex])
                     }
                 }
-                
                 if !isSetValid(square){
-                    // If an invalid square is found
                     return false
                 }
             }
         }
-        // All squares are valid
-        return true
+        return true;
     }
     
     // Checks if a given array of 9 numbers is valid
-    // A set is valid if it contains numbers 1-9 with no duplicates
-    // `Set` automatically handles duplicates
-    private func isSetValid(_ set: [Int]) -> Bool{
-        var seenNumbers = Set<Int>()
-        for number in set{
-            // If a number is outside the 1-9 range, it's invalid
-            if number < 1 || number > 9{
+    private func isSetValid(_ set: [Int]) -> Bool {
+        var seen: Set<Int> = []
+        for number in set {
+            // Skips empty cells
+            if number == 0 {
+                continue
+            }
+            // Checks for invalid numbers or duplicates
+            if number < 1 || number > 9 || seen.contains(number) {
                 return false
             }
-            // If the number has been seen before, it's a duplicate
-            if seenNumbers.contains(number){
-                return false
-            }
-            seenNumbers.insert(number)
+            seen.insert(number)
         }
-        // Got through the whole loop without issues, the set is valid
         return true
     }
 }
